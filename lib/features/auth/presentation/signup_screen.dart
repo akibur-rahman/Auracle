@@ -138,7 +138,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     },
                     backgroundColor: Colors.grey[800],
                     icon: Image.network(
-                      'https://www.googleapis.com/download/storage/v1/b/gweb-uniblog-publish-prod/o/images%2FdDdBl-QoTM8w_hE_YUzQeg.png?generation=1637834187242249&alt=media',
+                      'https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png',
                       width: 24,
                       height: 24,
                       errorBuilder:
