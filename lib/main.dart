@@ -1,39 +1,51 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
 
 void main() async {
-  await dotenv.load(fileName: '.env');
-  await Supabase.initialize(
-    url: dotenv.get('SUPABASE_URL'),
-    anonKey: dotenv.get('SUPABASE_ANON_KEY'),
-  );
+  WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const App());
+  try {
+    await dotenv.load(fileName: '.env');
+    log('Loaded .env file successfully');
+  } catch (e) {
+    log('Failed to load .env file: $e');
+    // Continue without the .env file for development
+  }
+
+  try {
+    await Supabase.initialize(
+      url:
+          dotenv.env['SUPABASE_URL'] ??
+          'https://placeholder-supabase-url.supabase.co',
+      anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? 'placeholder-anon-key',
+    );
+    log('Initialized Supabase successfully');
+  } catch (e) {
+    log('Failed to initialize Supabase: $e');
+    // Continue without Supabase for UI development
+  }
+
+  runApp(const ProviderScope(child: App()));
 }
 
-class App extends StatelessWidget {
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Auracle',
-      theme: ThemeData(primarySwatch: Colors.green),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Flutter Demo')),
-      body: const Center(child: Text('Hello, World!')),
+      theme: AppTheme.darkTheme,
+      routerConfig: router,
     );
   }
 }

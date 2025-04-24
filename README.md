@@ -1,16 +1,43 @@
-# auracle
+# Auracle
 
-A new Flutter project.
+A music app with beautiful UI built with Flutter.
+
+## Features
+
+- Beautiful dark theme UI
+- Login and signup screens
+- Google auth integration (UI only)
+- Responsive design
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+1. Make sure you have Flutter installed
+2. Clone this repository
+3. Create a `.env` file in the root directory with the following variables:
+   ```
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+4. Run `flutter pub get` to install dependencies
+5. Run `flutter run` to start the app
 
-A few resources to get you started if this is your first Flutter project:
+## Screenshots
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Login Screen
+- Signup Screen
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Architecture
+
+This project follows a feature-based architecture with clean separation of concerns:
+
+- **Core**: Contains reusable components, theme, and router configuration
+- **Features**: Contains domain-specific features (auth, music player, etc.)
+  - Each feature has presentation, application, and domain layers
+
+## Tech Stack
+
+- Flutter for UI
+- GoRouter for navigation
+- Riverpod for state management
+- Supabase for backend (configured but not implemented)
+- Google Fonts for typography
