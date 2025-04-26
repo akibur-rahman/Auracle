@@ -6,21 +6,17 @@ class AppTheme {
   static const _darkBackgroundColor = Color(
     0xFF121212,
   ); // Very dark gray, almost black
-  static const _darkSurfaceColor = Color(0xFF1E1E1E); // Dark gray for inputs
+  static const _darkSurfaceColor = Color(0xFF1E1E1E);
 
-  static final ThemeData darkTheme = ThemeData(
+  static ThemeData get darkTheme => ThemeData(
     useMaterial3: true,
-    brightness: Brightness.dark,
-    primaryColor: _primaryColor,
-    colorScheme: const ColorScheme.dark(
+    colorScheme: ColorScheme.dark(
       primary: _primaryColor,
-      background: _darkBackgroundColor,
-      surface: _darkSurfaceColor,
+      surface: _darkBackgroundColor,
+      surfaceContainerHighest: _darkSurfaceColor,
       onSurface: Colors.white,
-      onBackground: Colors.white,
       onPrimary: Colors.white,
     ),
-    scaffoldBackgroundColor: _darkBackgroundColor,
     textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -45,31 +41,19 @@ class AppTheme {
       prefixIconColor: Colors.grey,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.disabled)) {
-            return _primaryColor.withOpacity(0.5);
-          }
-          return _primaryColor;
-        }),
-        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-        textStyle: MaterialStateProperty.all<TextStyle>(
-          const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-          const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        ),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _primaryColor,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: _primaryColor.withOpacity(0.5),
+        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.all<Color>(_primaryColor),
-        textStyle: MaterialStateProperty.all<TextStyle>(
-          const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+      style: TextButton.styleFrom(
+        foregroundColor: _primaryColor,
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     ),
   );
