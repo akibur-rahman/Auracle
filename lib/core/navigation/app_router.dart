@@ -5,12 +5,14 @@ import '../../features/music/presentation/screens/home_screen.dart';
 import '../../features/music/presentation/screens/library_screen.dart';
 import '../../features/music/presentation/screens/player_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/auth/presentation/login_screen.dart';
 import 'app_navigation.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/login',
     routes: [
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       ShellRoute(
         builder: (context, state, child) => AppNavigation(child: child),
         routes: [
