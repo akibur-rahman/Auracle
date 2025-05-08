@@ -1,5 +1,5 @@
 name: auracle
-description: "A new Flutter project."
+description: "Auracle: The Ultimate Lossless Music Streaming Platform With Lossless Quality And Multi-platform Support"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -40,10 +40,21 @@ dependencies:
   json_annotation: ^4.8.1
   cached_network_image: ^3.3.1
   riverpod_annotation: ^2.3.4
+  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/appicon/appiconicon.png"
+  adaptive_icon_foreground: "assets/appicon/play_store_512.png"
+  adaptive_icon_background: "#E2EFE5"
+  min_sdk_android: 21
+  remove_alpha_ios: true
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -68,7 +79,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
+    - assets/appicon/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

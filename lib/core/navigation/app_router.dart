@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:auracle/features/music/presentation/screens/search_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/music/presentation/screens/home_screen.dart';
 import '../../features/music/presentation/screens/library_screen.dart';
 import '../../features/music/presentation/screens/player_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
 import 'app_navigation.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -21,17 +22,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/search',
             pageBuilder:
-                (context, state) => NoTransitionPage(
-                  child: Container(
-                    color: Colors.black,
-                    child: const Center(
-                      child: Text(
-                        'Search',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
+                (context, state) =>
+                    NoTransitionPage(child: const SearchScreen()),
           ),
           GoRoute(
             path: '/library',
@@ -42,17 +34,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/profile',
             pageBuilder:
-                (context, state) => NoTransitionPage(
-                  child: Container(
-                    color: Colors.black,
-                    child: const Center(
-                      child: Text(
-                        'Profile',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
+                (context, state) =>
+                    NoTransitionPage(child: const ProfileScreen()),
           ),
         ],
       ),

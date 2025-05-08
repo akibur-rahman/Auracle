@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/models/album.dart';
 import '../domain/models/playlist.dart';
+import '../domain/models/song.dart';
 
 final homeDataProvider = FutureProvider<HomeViewModel>((ref) async {
   // Simulate network delay
@@ -9,8 +10,8 @@ final homeDataProvider = FutureProvider<HomeViewModel>((ref) async {
   // Return mock data
   return HomeViewModel(
     recentlyPlayed: _mockRecentlyPlayed(),
-    madeForYou: _mockMadeForYou(),
-    popularPlaylists: _mockPopularPlaylists(),
+    YourPlaylist: _mockYourPlaylist(),
+    LocalMusic: _mockLocalMusic(),
   );
 });
 
@@ -47,7 +48,7 @@ List<Album> _mockRecentlyPlayed() {
   ];
 }
 
-List<Playlist> _mockMadeForYou() {
+List<Playlist> _mockYourPlaylist() {
   return [
     Playlist(
       id: '1',
@@ -66,47 +67,46 @@ List<Playlist> _mockMadeForYou() {
   ];
 }
 
-List<Playlist> _mockPopularPlaylists() {
+List<Song> _mockLocalMusic() {
   return [
-    Playlist(
-      id: '3',
-      title: 'Top Hits 2023',
-      description: 'The biggest hits of the year',
+    Song(
+      id: 'local1',
+      title: 'Shape of You',
+      artist: 'Ed Sheeran',
+      albumName: '÷ (Divide)',
+      duration: '3:54',
       imageUrl:
-          'https://images.unsplash.com/photo-1669173034860-eca2e1ee62b2?q=80&w=400',
+          'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400',
     ),
-    Playlist(
-      id: '4',
-      title: 'Chill Vibes',
-      description: 'Perfect for relaxing',
+    Song(
+      id: 'local2',
+      title: 'Blinding Lights',
+      artist: 'The Weeknd',
+      albumName: 'After Hours',
+      duration: '3:20',
       imageUrl:
-          'https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?q=80&w=400',
+          'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=400',
     ),
-    Playlist(
-      id: '5',
-      title: 'Workout Beats',
-      description: 'Energy boosting tracks',
+    Song(
+      id: 'local3',
+      title: 'Dance Monkey',
+      artist: 'Tones and I',
+      albumName: 'The Kids Are Coming',
+      duration: '3:29',
       imageUrl:
-          'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=400',
-    ),
-    Playlist(
-      id: '6',
-      title: 'Throwback Classics',
-      description: 'Hits from the 90s and 00s',
-      imageUrl:
-          'https://images.unsplash.com/photo-1458560871784-56d23406c091?q=80&w=400',
+          'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=400',
     ),
   ];
 }
 
 class HomeViewModel {
   final List<Album> recentlyPlayed;
-  final List<Playlist> madeForYou;
-  final List<Playlist> popularPlaylists;
+  final List<Playlist> YourPlaylist;
+  final List<Song> LocalMusic;
 
   HomeViewModel({
     required this.recentlyPlayed,
-    required this.madeForYou,
-    required this.popularPlaylists,
+    required this.YourPlaylist,
+    required this.LocalMusic,
   });
 }

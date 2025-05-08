@@ -7,31 +7,50 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/navigation/app_router.dart';
 import 'core/theme/app_theme.dart';
 
+Future<void> initializeApp() async {
+  try {
+    // Load environment variables
+    await dotenv.load(fileName: '.env');
+    log('Environment variables loaded successfully');
+
+    // Initialize Supabase
+    final supabaseUrl = dotenv.env['SUPABASE_URL'];
+    final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+
+    if (supabaseUrl == null || supabaseAnonKey == null) {
+      throw Exception('Missing Supabase credentials in .env file');
+    }
+
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+    log('Supabase initialized successfully');
+  } catch (e, stackTrace) {
+    log('Failed to initialize app', error: e, stackTrace: stackTrace);
+    rethrow;
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await dotenv.load(fileName: '.env');
-    log('Loaded .env file successfully');
+    await initializeApp();
+    runApp(const ProviderScope(child: AuracleApp()));
   } catch (e) {
-    log('Failed to load .env file: $e');
-    // Continue without the .env file for development
-  }
-
-  try {
-    await Supabase.initialize(
-      url:
-          dotenv.env['SUPABASE_URL'] ??
-          'https://placeholder-supabase-url.supabase.co',
-      anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? 'placeholder-anon-key',
+    log('Fatal error during app initialization', error: e);
+    // You might want to show a user-friendly error screen here
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text(
+              'Failed to initialize app. Please try again later.',
+              style: TextStyle(color: Colors.red[400]),
+            ),
+          ),
+        ),
+      ),
     );
-    log('Initialized Supabase successfully');
-  } catch (e) {
-    log('Failed to initialize Supabase: $e');
-    // Continue without Supabase for UI development
   }
-
-  runApp(const ProviderScope(child: AuracleApp()));
 }
 
 class AuracleApp extends ConsumerWidget {
