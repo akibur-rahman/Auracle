@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Auracle</string>
+    <string name="storage_permission_message">Storage permission is required to access audio files</string>
+</resources> 

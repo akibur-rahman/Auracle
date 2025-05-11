@@ -6,6 +6,7 @@ import '../../features/music/presentation/screens/home_screen.dart';
 import '../../features/music/presentation/screens/library_screen.dart';
 import '../../features/music/presentation/screens/player_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/creator/presentation/screens/dashboard_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/signup_screen.dart';
 import '../../features/auth/domain/auth_service.dart';
@@ -81,6 +82,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/player',
         builder: (context, state) => const PlayerScreen(),
+      ),
+      GoRoute(
+        path: '/creator-dashboard',
+        builder: (context, state) => const CreatorDashboardScreen(),
       ),
     ],
   );

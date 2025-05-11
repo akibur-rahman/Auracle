@@ -140,6 +140,13 @@ class ProfileScreen extends ConsumerWidget {
                           // TODO: Navigate to edit profile
                         },
                       ),
+                      _SettingsItem(
+                        icon: Icons.music_note,
+                        title: 'Creator Dashboard',
+                        onTap: () {
+                          context.push('/creator-dashboard');
+                        },
+                      ),
                     ],
                   ),
                   _SettingsSection(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../application/home_provider.dart';
 import '../../application/player_provider.dart';
 import '../../domain/models/album.dart';
@@ -9,6 +10,7 @@ import '../widgets/album_card.dart';
 import '../widgets/playlist_card.dart';
 import '../widgets/section_header.dart';
 import '../widgets/mini_player.dart';
+import '../../../../features/auth/domain/auth_service.dart';
 
 class HomeScreen extends ConsumerWidget {
   final bool showMiniPlayer;
@@ -18,6 +20,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeDataAsync = ref.watch(homeDataProvider);
+    final user = ref.watch(authServiceProvider).valueOrNull;
 
     // Initialize the current song when the home screen is loaded
     ref.listen<AsyncValue<HomeViewModel>>(homeDataProvider, (_, state) {
@@ -35,7 +38,7 @@ class HomeScreen extends ConsumerWidget {
           children: [
             Expanded(
               child: homeDataAsync.when(
-                data: (homeData) => _buildContent(context, homeData, ref),
+                data: (homeData) => _buildContent(context, homeData, ref, user),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stack) => _buildError(context, error),
               ),
@@ -52,10 +55,11 @@ class HomeScreen extends ConsumerWidget {
     BuildContext context,
     HomeViewModel homeData,
     WidgetRef ref,
+    User? user,
   ) {
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: _buildGreeting(context)),
+        SliverToBoxAdapter(child: _buildGreeting(context, user)),
         SliverToBoxAdapter(
           child: SectionHeader(title: 'Recently Played', onSeeAllTap: () {}),
         ),
@@ -79,7 +83,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildGreeting(BuildContext context) {
+  Widget _buildGreeting(BuildContext context, User? user) {
     final hour = DateTime.now().hour;
     String greeting;
 
@@ -90,6 +94,10 @@ class HomeScreen extends ConsumerWidget {
     } else {
       greeting = 'Good evening';
     }
+
+    // Get the first name from display name or use a default
+    final displayName = user?.displayName ?? 'User';
+    final firstName = displayName.split(' ').first;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -105,7 +113,7 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Akibur',
+            firstName,
             style: Theme.of(
               context,
             ).textTheme.headlineSmall?.copyWith(color: Colors.grey[400]),

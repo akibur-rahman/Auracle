@@ -69,8 +69,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1095908565685',
     projectId: 'auracle-f725b',
     storageBucket: 'auracle-f725b.firebasestorage.app',
-    iosClientId:
-        '1095908565685-akevlq76rjq7jvn5b9hicg77nt8tvd20.apps.googleusercontent.com',
+    androidClientId: '1095908565685-qj337t9vhimmvhsic63qqeopg2ofkm76.apps.googleusercontent.com',
+    iosClientId: '1095908565685-akevlq76rjq7jvn5b9hicg77nt8tvd20.apps.googleusercontent.com',
     iosBundleId: 'com.juktobit.auracle',
   );
+
 }
