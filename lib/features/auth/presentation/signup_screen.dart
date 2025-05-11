@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/common/widgets/custom_button.dart';
 import '../../../core/common/widgets/custom_text_field.dart';
+import '../domain/auth_service.dart';
 
-class SignupScreen extends StatefulWidget {
+class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -25,12 +28,45 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _signUp() {
+  Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
-      // This would handle registration in a real app
-      debugPrint('Username: ${_usernameController.text}');
-      debugPrint('Email: ${_emailController.text}');
-      debugPrint('Password: ${_passwordController.text}');
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      try {
+        final authService = ref.read(authServiceProvider.notifier);
+        await authService.createUserWithEmail(
+          _emailController.text.trim(),
+          _passwordController.text,
+          _usernameController.text.trim(),
+        );
+        // Navigation will be handled by the router
+      } catch (e) {
+        setState(() {
+          _errorMessage = e.toString();
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _signUpWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final authService = ref.read(authServiceProvider.notifier);
+      await authService.signInWithGoogle();
+      // Navigation will be handled by the router
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
     }
   }
 
@@ -63,6 +99,17 @@ class _SignupScreenState extends State<SignupScreen> {
                     ).textTheme.titleMedium?.copyWith(color: Colors.grey),
                   ),
                   const SizedBox(height: 48),
+
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: SelectableText.rich(
+                        TextSpan(
+                          text: _errorMessage,
+                          style: TextStyle(color: Colors.red[400]),
+                        ),
+                      ),
+                    ),
 
                   // Username Input
                   CustomTextField(
@@ -133,9 +180,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   // Google Sign In Button
                   CustomButton(
                     text: 'Continue with Google',
-                    onPressed: () {
-                      // Handle Google sign in
-                    },
+                    onPressed: _signUpWithGoogle,
                     backgroundColor: Colors.grey[800],
                     icon: Image.network(
                       'https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png',

@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/common/widgets/custom_button.dart';
 import '../../../core/common/widgets/custom_text_field.dart';
+import '../domain/auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -23,11 +26,44 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signIn() {
+  Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
-      // This would handle authentication in a real app
-      debugPrint('Email: ${_emailController.text}');
-      debugPrint('Password: ${_passwordController.text}');
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      try {
+        final authService = ref.read(authServiceProvider.notifier);
+        await authService.signInWithEmail(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
+        // Navigation will be handled by the router
+      } catch (e) {
+        setState(() {
+          _errorMessage = e.toString();
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final authService = ref.read(authServiceProvider.notifier);
+      await authService.signInWithGoogle();
+      // Navigation will be handled by the router
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
     }
   }
 
@@ -61,7 +97,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 48),
 
-                  // Email Input
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: SelectableText.rich(
+                        TextSpan(
+                          text: _errorMessage,
+                          style: TextStyle(color: Colors.red[400]),
+                        ),
+                      ),
+                    ),
+
                   CustomTextField(
                     hintText: 'Email',
                     controller: _emailController,
@@ -81,8 +127,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  // Password Input
                   CustomTextField(
                     hintText: 'Password',
                     controller: _passwordController,
@@ -111,9 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Google Sign In Button
                   CustomButton(
                     text: 'Continue with Google',
-                    onPressed: () {
-                      // Handle Google sign in
-                    },
+                    onPressed: _signInWithGoogle,
                     backgroundColor: Colors.grey[800],
                     icon: Image.network(
                       'https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png',

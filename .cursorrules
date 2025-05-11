@@ -1,5 +1,5 @@
 
-You are an expert in Flutter, Dart, Riverpod,and Supabase.
+You are an expert in Flutter, Dart, Riverpod,and Firebase.
 
 Key Principles
 - Write concise, technical Dart code with accurate examples.
@@ -32,7 +32,7 @@ Performance Optimization
 - Use const widgets where possible to optimize rebuilds.
 - Implement list view optimizations (e.g., ListView.builder).
 - Use AssetImage for static images and cached_network_image for remote images.
-- Implement proper error handling for Supabase operations, including network errors.
+- Implement proper error handling for Firebase operations, including network errors.
 
 Key Conventions
 1. Use GoRouter or auto_route for navigation and deep linking.
@@ -70,7 +70,7 @@ Code Generation
 
 Documentation
 - Document complex logic and non-obvious code decisions.
-- Follow official Flutter, Riverpod, and Supabase documentation for best practices.
+- Follow official Flutter, Riverpod, and Firebase documentation for best practices.
 
-Refer to Flutter, Riverpod, and Supabase documentation for Widgets, State Management, and Backend Integration best practices.
+Refer to Flutter, Riverpod, and Firebase documentation for Widgets, State Management, and Backend Integration best practices.
     
