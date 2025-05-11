@@ -7,6 +7,7 @@ class Song {
   final String duration;
   final bool isPlaying;
   final bool isFavorite;
+  final String? storageUrl;
 
   const Song({
     required this.id,
@@ -17,5 +18,6 @@ class Song {
     required this.duration,
     this.isPlaying = false,
     this.isFavorite = false,
+    this.storageUrl,
   });
 }

@@ -2,101 +2,50 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/models/album.dart';
 import '../domain/models/playlist.dart';
 import '../domain/models/song.dart';
+import 'tracks_provider.dart';
+import 'player_provider.dart';
 
 final homeDataProvider = FutureProvider<HomeViewModel>((ref) async {
-  // Simulate network delay
-  await Future.delayed(const Duration(milliseconds: 500));
+  // Get the recently played tracks from the provider
+  final recentlyPlayed = ref.watch(recentlyPlayedProvider);
 
-  // Return mock data
+  // If there are no recently played tracks, get some tracks from the database
+  final recentAlbums = recentlyPlayed.isNotEmpty
+      ? _createAlbumsFromTracks(recentlyPlayed)
+      : await _getFallbackAlbums(ref);
+
+  // Get real playlists (empty list for now, will be populated from Firebase in future)
+  final playlists = <Playlist>[];
+
+  // Return data
   return HomeViewModel(
-    recentlyPlayed: _mockRecentlyPlayed(),
-    YourPlaylist: _mockYourPlaylist(),
-    LocalMusic: _mockLocalMusic(),
+    recentlyPlayed: recentAlbums,
+    YourPlaylist: playlists,
+    LocalMusic: [], // No local music for now
   );
 });
 
-List<Album> _mockRecentlyPlayed() {
-  return [
-    Album(
-      id: '1',
-      title: 'Midnight Memories',
-      artist: 'Taylor Swift',
-      imageUrl:
-          'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=400',
-    ),
-    Album(
-      id: '2',
-      title: 'Summer Vibes',
-      artist: 'The Weeknd',
-      imageUrl:
-          'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=400',
-    ),
-    Album(
-      id: '3',
-      title: 'Acoustic Sessions',
-      artist: 'Ed Sheeran',
-      imageUrl:
-          'https://images.unsplash.com/photo-1516223725307-6f76b9ec8742?q=80&w=400',
-    ),
-    Album(
-      id: '4',
-      title: 'Eternal Sunshine',
-      artist: 'Ariana Grande',
-      imageUrl:
-          'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400',
-    ),
-  ];
+// Helper to create album objects from tracks
+List<Album> _createAlbumsFromTracks(List<Song> tracks) {
+  // Convert tracks to albums
+  return tracks
+      .map((song) => Album(
+            id: song.id,
+            title: song.title,
+            artist: song.artist,
+            imageUrl: song.imageUrl,
+          ))
+      .toList();
 }
 
-List<Playlist> _mockYourPlaylist() {
-  return [
-    Playlist(
-      id: '1',
-      title: 'Daily Mix 1',
-      description: 'Based on your recent listening',
-      imageUrl:
-          'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=400',
-    ),
-    Playlist(
-      id: '2',
-      title: 'Discover Weekly',
-      description: 'Your weekly mixtape of fresh music',
-      imageUrl:
-          'https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?q=80&w=400',
-    ),
-  ];
-}
-
-List<Song> _mockLocalMusic() {
-  return [
-    Song(
-      id: 'local1',
-      title: 'Shape of You',
-      artist: 'Ed Sheeran',
-      albumName: '÷ (Divide)',
-      duration: '3:54',
-      imageUrl:
-          'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400',
-    ),
-    Song(
-      id: 'local2',
-      title: 'Blinding Lights',
-      artist: 'The Weeknd',
-      albumName: 'After Hours',
-      duration: '3:20',
-      imageUrl:
-          'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=400',
-    ),
-    Song(
-      id: 'local3',
-      title: 'Dance Monkey',
-      artist: 'Tones and I',
-      albumName: 'The Kids Are Coming',
-      duration: '3:29',
-      imageUrl:
-          'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=400',
-    ),
-  ];
+// Fallback to get some albums if no recently played tracks
+Future<List<Album>> _getFallbackAlbums(Ref ref) async {
+  try {
+    final tracks = await ref.watch(tracksProvider.future);
+    return _createAlbumsFromTracks(tracks);
+  } catch (e) {
+    return []; // Return empty list if there's an error
+  }
 }
 
 class HomeViewModel {

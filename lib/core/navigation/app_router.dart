@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/music/presentation/screens/home_screen.dart';
 import '../../features/music/presentation/screens/library_screen.dart';
 import '../../features/music/presentation/screens/player_screen.dart';
+import '../../features/music/presentation/screens/all_tracks_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/creator/presentation/screens/dashboard_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
@@ -56,32 +57,33 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/',
-            pageBuilder:
-                (context, state) => NoTransitionPage(child: const HomeScreen()),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: const HomeScreen()),
           ),
           GoRoute(
             path: '/search',
-            pageBuilder:
-                (context, state) =>
-                    NoTransitionPage(child: const SearchScreen()),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: const SearchScreen()),
           ),
           GoRoute(
             path: '/library',
-            pageBuilder:
-                (context, state) =>
-                    NoTransitionPage(child: const LibraryScreen()),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: const LibraryScreen()),
           ),
           GoRoute(
             path: '/profile',
-            pageBuilder:
-                (context, state) =>
-                    NoTransitionPage(child: const ProfileScreen()),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: const ProfileScreen()),
           ),
         ],
       ),
       GoRoute(
         path: '/player',
         builder: (context, state) => const PlayerScreen(),
+      ),
+      GoRoute(
+        path: '/all-tracks',
+        builder: (context, state) => const AllTracksScreen(),
       ),
       GoRoute(
         path: '/creator-dashboard',
