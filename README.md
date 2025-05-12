@@ -41,3 +41,24 @@ This project follows a feature-based architecture with clean separation of conce
 - Riverpod for state management
 - Supabase for backend (configured but not implemented)
 - Google Fonts for typography
+
+## Search Functionality
+
+Auracle implements a powerful search feature that allows users to find songs and artists quickly:
+
+### Search Implementation
+
+The search functionality uses a three-tier approach:
+
+1. **Direct Title Matching** - Highest priority is given to songs whose titles directly contain the search query.
+2. **Artist Matching** - Second tier priority is given to songs by artists whose names match the search query.
+3. **Fuzzy Matching** - For less precise searches, we use the fuzzywuzzy package to find close matches based on string similarity.
+
+The search avoids duplicate results by tracking already added songs and ensures a responsive user experience by updating results as you type. When a user taps on a search result, the song begins playing immediately.
+
+### User Experience
+
+- The search screen provides genre category cards that can be tapped to quickly initiate a search
+- Empty states are handled gracefully with helpful messaging
+- Results display in a consistent format with the rest of the app
+- The search box automatically receives focus when entering the screen
