@@ -9,7 +9,8 @@ class AllTracksScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allTracksAsync = ref.watch(allTracksProvider);
+    // Use the stream-based provider for real-time updates
+    final allTracksAsync = ref.watch(allTracksStreamProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -59,8 +60,8 @@ class AllTracksScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Tracks you upload will appear here',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            'Upload some music to get started',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.grey[400],
                 ),
           ),
@@ -73,22 +74,30 @@ class AllTracksScreen extends ConsumerWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SelectableText.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: 'Error loading tracks\n',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.red,
-                    ),
-              ),
-              TextSpan(
-                text: error.toString(),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
-          textAlign: TextAlign.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Error loading tracks',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error.toString(),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Colors.red[300],
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );

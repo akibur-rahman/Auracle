@@ -33,13 +33,20 @@ class TrackList extends ConsumerWidget {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.grey[900],
+            color: const Color(0xFF1A1A1A),
             borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16.0,
-              vertical: 8.0,
+              vertical: 12.0,
             ),
             leading: Row(
               mainAxisSize: MainAxisSize.min,
@@ -94,14 +101,6 @@ class TrackList extends ConsumerWidget {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  song.duration,
-                  style: TextStyle(
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.grey,
-                  ),
-                ),
                 const SizedBox(width: 16),
                 if (isSelected && isPlaying)
                   IconButton(

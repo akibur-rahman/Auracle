@@ -31,7 +31,8 @@ final trackPlaybackUriProvider =
 // Initial song provider
 final initialSongProvider = FutureProvider<Song?>((ref) async {
   try {
-    final tracks = await ref.watch(tracksProvider.future);
+    // Watch the stream instead of the future
+    final tracks = await ref.watch(tracksStreamProvider.future);
     return tracks.isNotEmpty ? tracks.first : null;
   } catch (e) {
     dev.log('Error getting initial song: $e');

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../application/home_provider.dart';
 import '../../application/player_provider.dart';
 import '../../application/tracks_provider.dart';
@@ -22,8 +23,10 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the stream-based homeDataProvider
     final homeDataAsync = ref.watch(homeDataProvider);
-    final tracksAsync = ref.watch(tracksProvider);
+    // Switch to using the stream-based tracksProvider
+    final tracksAsync = ref.watch(tracksStreamProvider);
     final user = ref.watch(authServiceProvider).valueOrNull;
     final initialSongAsync = ref.watch(initialSongProvider);
 
@@ -72,7 +75,10 @@ class HomeScreen extends ConsumerWidget {
         SliverToBoxAdapter(child: _buildGreeting(context, user)),
         if (homeData.recentlyPlayed.isNotEmpty) ...[
           SliverToBoxAdapter(
-            child: SectionHeader(title: 'Recently Played', onSeeAllTap: () {}),
+            child: SectionHeader(
+              title: 'Recently Played',
+              onSeeAllTap: () => context.push('/recently-played'),
+            ),
           ),
           SliverToBoxAdapter(
             child: _buildRecentlyPlayed(context, homeData.recentlyPlayed, ref),
@@ -80,7 +86,18 @@ class HomeScreen extends ConsumerWidget {
         ],
         if (homeData.YourPlaylist.isNotEmpty) ...[
           SliverToBoxAdapter(
-            child: SectionHeader(title: 'Your Playlists', onSeeAllTap: () {}),
+            child: SectionHeader(
+              title: 'Your Playlists',
+              onSeeAllTap: () {
+                // Will be implemented in future
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Playlists coming soon!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+            ),
           ),
           SliverToBoxAdapter(
             child: _buildYourPlaylists(context, homeData.YourPlaylist, ref),
@@ -115,6 +132,7 @@ class HomeScreen extends ConsumerWidget {
     // Get the first name from display name or use a default
     final displayName = user?.displayName ?? 'User';
     final firstName = displayName.split(' ').first;
+    final photoUrl = user?.photoURL;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -129,14 +147,43 @@ class HomeScreen extends ConsumerWidget {
                 ),
           ),
           const SizedBox(height: 8),
-          Text(
-            firstName,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(color: Colors.grey[400]),
+          Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: photoUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: photoUrl,
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            _buildDefaultAvatar(context),
+                        errorWidget: (context, url, error) =>
+                            _buildDefaultAvatar(context),
+                      )
+                    : _buildDefaultAvatar(context),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                firstName,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Colors.grey[400],
+                    ),
+              ),
+            ],
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDefaultAvatar(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      color: Theme.of(context).colorScheme.primary,
+      child: const Icon(Icons.person, size: 24, color: Colors.white),
     );
   }
 
@@ -146,7 +193,6 @@ class HomeScreen extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final controls = ref.watch(playerControlsProvider);
-    final tracksAsync = ref.watch(tracksProvider.future);
     final recentlyPlayed = ref.watch(recentlyPlayedProvider);
 
     return SizedBox(
@@ -162,7 +208,8 @@ class HomeScreen extends ConsumerWidget {
             child: AlbumCard(
               album: album,
               onTap: () async {
-                final tracks = await tracksAsync;
+                final tracksValue = ref.read(tracksStreamProvider).valueOrNull;
+                final tracks = tracksValue ?? [];
 
                 // Try to find the matching song from recentlyPlayed
                 Song? songToPlay;
@@ -227,10 +274,9 @@ class HomeScreen extends ConsumerWidget {
             child: PlaylistCard(
               playlist: playlists[index],
               onTap: () async {
-                // Find first available song
-                final tracks = await ref.read(tracksProvider.future);
+                final tracksValue = ref.read(tracksStreamProvider).valueOrNull;
+                final tracks = tracksValue ?? [];
                 if (tracks.isNotEmpty) {
-                  // Play all tracks in the playlist with queue setup
                   await controls.playWithQueue(tracks.first, tracks, 0);
                 }
               },

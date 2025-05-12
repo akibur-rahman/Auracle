@@ -6,6 +6,7 @@ import '../../features/music/presentation/screens/home_screen.dart';
 import '../../features/music/presentation/screens/library_screen.dart';
 import '../../features/music/presentation/screens/player_screen.dart';
 import '../../features/music/presentation/screens/all_tracks_screen.dart';
+import '../../features/music/presentation/screens/recently_played_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/creator/presentation/screens/dashboard_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
@@ -84,6 +85,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/all-tracks',
         builder: (context, state) => const AllTracksScreen(),
+      ),
+      GoRoute(
+        path: '/recently-played',
+        builder: (context, state) => const RecentlyPlayedScreen(),
       ),
       GoRoute(
         path: '/creator-dashboard',

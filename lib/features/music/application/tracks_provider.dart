@@ -7,6 +7,46 @@ import '../../../features/creator/domain/models/track.dart';
 
 part 'tracks_provider.g.dart';
 
+// Stream-based provider that listens to Firestore changes in real-time
+final tracksStreamProvider = StreamProvider<List<Song>>((ref) {
+  try {
+    return FirebaseFirestore.instance
+        .collection('tracks')
+        .where('isDeleted', isEqualTo: false)
+        .orderBy('createdAt', descending: true)
+        .limit(5)
+        .snapshots()
+        .handleError((e) {
+      dev.log('Error in tracksStreamProvider: $e');
+      if (e.toString().contains('index')) {
+        dev.log('Missing index, using fallback query without ordering');
+        // Return a simpler query that doesn't require the composite index
+        return FirebaseFirestore.instance
+            .collection('tracks')
+            .limit(5)
+            .snapshots();
+      }
+      throw e;
+    }).map((snapshot) {
+      return snapshot.docs
+          .map((doc) => trackToSong(Track.fromFirestore(doc)))
+          .toList();
+    });
+  } catch (e) {
+    dev.log('Fallback to simple query in tracksStreamProvider: $e');
+    // Fallback to a very simple query if all else fails
+    return FirebaseFirestore.instance
+        .collection('tracks')
+        .limit(5)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => trackToSong(Track.fromFirestore(doc)))
+          .toList();
+    });
+  }
+});
+
 // Provider for fetching a limited number of tracks (5) for the home screen
 @riverpod
 Future<List<Song>> tracks(TracksRef ref) async {
@@ -89,6 +129,49 @@ Future<List<Song>> allTracks(AllTracksRef ref) async {
     rethrow;
   }
 }
+
+// Stream-based provider for all tracks
+final allTracksStreamProvider = StreamProvider<List<Song>>((ref) {
+  try {
+    return FirebaseFirestore.instance
+        .collection('tracks')
+        .where('isDeleted', isEqualTo: false)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .handleError((e) {
+      dev.log('Error in allTracksStreamProvider: $e');
+      if (e.toString().contains('index')) {
+        dev.log('Missing index, using fallback query without ordering');
+        // Return a simpler query that doesn't require the composite index
+        return FirebaseFirestore.instance.collection('tracks').snapshots();
+      }
+      throw e;
+    }).map((snapshot) {
+      final docs = snapshot.docs;
+      // Sort in memory instead since we can't use Firestore ordering
+      final tracks = docs
+          .map((doc) => trackToSong(Track.fromFirestore(doc)))
+          .toList()
+        ..sort((a, b) =>
+            b.id.compareTo(a.id)); // Approximate sort by creation time
+      return tracks;
+    });
+  } catch (e) {
+    dev.log('Fallback to simple query in allTracksStreamProvider: $e');
+    // Fallback to a very simple query if all else fails
+    return FirebaseFirestore.instance
+        .collection('tracks')
+        .snapshots()
+        .map((snapshot) {
+      final docs = snapshot.docs;
+      final tracks = docs
+          .map((doc) => trackToSong(Track.fromFirestore(doc)))
+          .toList()
+        ..sort((a, b) => b.id.compareTo(a.id)); // Approximate sort
+      return tracks;
+    });
+  }
+});
 
 // Helper function to convert Track to Song
 Song trackToSong(Track track) {

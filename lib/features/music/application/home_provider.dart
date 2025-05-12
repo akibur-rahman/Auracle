@@ -5,24 +5,36 @@ import '../domain/models/song.dart';
 import 'tracks_provider.dart';
 import 'player_provider.dart';
 
-final homeDataProvider = FutureProvider<HomeViewModel>((ref) async {
+// Convert to StreamProvider for real-time updates
+final homeDataProvider = StreamProvider<HomeViewModel>((ref) async* {
   // Get the recently played tracks from the provider
   final recentlyPlayed = ref.watch(recentlyPlayedProvider);
 
-  // If there are no recently played tracks, get some tracks from the database
-  final recentAlbums = recentlyPlayed.isNotEmpty
-      ? _createAlbumsFromTracks(recentlyPlayed)
-      : await _getFallbackAlbums(ref);
-
-  // Get real playlists (empty list for now, will be populated from Firebase in future)
-  final playlists = <Playlist>[];
-
-  // Return data
-  return HomeViewModel(
-    recentlyPlayed: recentAlbums,
-    YourPlaylist: playlists,
-    LocalMusic: [], // No local music for now
+  // Initial state with recently played (if available)
+  yield HomeViewModel(
+    recentlyPlayed: recentlyPlayed.isNotEmpty
+        ? _createAlbumsFromTracks(recentlyPlayed)
+        : [],
+    YourPlaylist: [],
+    LocalMusic: [],
   );
+
+  // Stream of tracks to get real-time updates
+  await for (final trackSnapshot in ref.watch(tracksStreamProvider.stream)) {
+    final recentAlbums = recentlyPlayed.isNotEmpty
+        ? _createAlbumsFromTracks(recentlyPlayed)
+        : _createAlbumsFromTracks(trackSnapshot);
+
+    // Get playlists (empty list for now)
+    final playlists = <Playlist>[];
+
+    // Yield updated data
+    yield HomeViewModel(
+      recentlyPlayed: recentAlbums,
+      YourPlaylist: playlists,
+      LocalMusic: [], // No local music for now
+    );
+  }
 });
 
 // Helper to create album objects from tracks
@@ -36,16 +48,6 @@ List<Album> _createAlbumsFromTracks(List<Song> tracks) {
             imageUrl: song.imageUrl,
           ))
       .toList();
-}
-
-// Fallback to get some albums if no recently played tracks
-Future<List<Album>> _getFallbackAlbums(Ref ref) async {
-  try {
-    final tracks = await ref.watch(tracksProvider.future);
-    return _createAlbumsFromTracks(tracks);
-  } catch (e) {
-    return []; // Return empty list if there's an error
-  }
 }
 
 class HomeViewModel {
