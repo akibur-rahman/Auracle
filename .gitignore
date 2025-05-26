@@ -48,4 +48,5 @@ app.*.map.json
 # Secrects 
 *.env
 firebase.json
+google-services.json
 
