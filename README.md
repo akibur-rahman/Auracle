@@ -23,16 +23,16 @@ A modern music streaming application built with Flutter, featuring a beautiful d
 ## 📸 Screenshots
 
 ### Authentication Screens
-![Login Screen](screenshots/screenshot2.png)
+![Login Screen](screenshots/screenshot2.jpg)
 ![Signup Screen](screenshots/screenshot3.jpg)
 
 ### Main App Screens
-![Home Screen](screenshots/screenshot4.png)
-![Music Player](screenshots/screenshot5.png)
-![Playlist View](screenshots/screenshot6.png)
-![Search Screen](screenshots/screenshot7.png)
-![Profile Screen](screenshots/screenshot8.png)
-![Settings Screen](screenshots/screenshot9.png)
+![Home Screen](screenshots/screenshot4.jpg)
+![Music Player](screenshots/screenshot5.jpg)
+![Playlist View](screenshots/screenshot6.jpg)
+![Search Screen](screenshots/screenshot7.jpg)
+![Profile Screen](screenshots/screenshot8.jpg)
+![Settings Screen](screenshots/screenshot9.jpg)
 
 ## 🚀 Getting Started
 
