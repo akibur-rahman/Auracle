@@ -2,7 +2,7 @@
 
 A modern music streaming application built with Flutter, featuring a beautiful dark theme UI and seamless user experience.
 
-![Auracle Banner](screenshots/screenshot1.png)
+![Auracle Banner](screenshots/screenshot1.jpg)
 
 ## 🌟 Features
 
@@ -23,16 +23,26 @@ A modern music streaming application built with Flutter, featuring a beautiful d
 ## 📸 Screenshots
 
 ### Authentication Screens
-![Login Screen](screenshots/screenshot2.jpg)
-![Signup Screen](screenshots/screenshot3.jpg)
+<table>
+<tr>
+<td><img src="screenshots/screenshot2.jpg" alt="Login Screen" width="300"/></td>
+<td><img src="screenshots/screenshot3.jpg" alt="Signup Screen" width="300"/></td>
+</tr>
+</table>
 
 ### Main App Screens
-![Home Screen](screenshots/screenshot4.jpg)
-![Music Player](screenshots/screenshot5.jpg)
-![Playlist View](screenshots/screenshot6.jpg)
-![Search Screen](screenshots/screenshot7.jpg)
-![Profile Screen](screenshots/screenshot8.jpg)
-![Settings Screen](screenshots/screenshot9.jpg)
+<table>
+<tr>
+<td><img src="screenshots/screenshot4.jpg" alt="Home Screen" width="300"/></td>
+<td><img src="screenshots/screenshot5.jpg" alt="Music Player" width="300"/></td>
+<td><img src="screenshots/screenshot6.jpg" alt="Playlist View" width="300"/></td>
+</tr>
+<tr>
+<td><img src="screenshots/screenshot7.jpg" alt="Search Screen" width="300"/></td>
+<td><img src="screenshots/screenshot8.jpg" alt="Profile Screen" width="300"/></td>
+<td><img src="screenshots/screenshot9.jpg" alt="Settings Screen" width="300"/></td>
+</tr>
+</table>
 
 ## 🚀 Getting Started
 
