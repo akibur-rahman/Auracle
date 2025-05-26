@@ -9,6 +9,14 @@ part 'tracks_provider.g.dart';
 
 // Stream-based provider that listens to Firestore changes in real-time
 final tracksStreamProvider = StreamProvider<List<Song>>((ref) {
+  // Initialize with a value from the simpler provider to avoid loading forever
+  ref.listenSelf((previous, next) {
+    if (next is AsyncLoading && previous == null) {
+      // On first load, immediately fetch some tracks with the simpler future provider
+      ref.read(tracksProvider);
+    }
+  });
+
   try {
     return FirebaseFirestore.instance
         .collection('tracks')
@@ -28,9 +36,10 @@ final tracksStreamProvider = StreamProvider<List<Song>>((ref) {
       }
       throw e;
     }).map((snapshot) {
-      return snapshot.docs
+      final tracks = snapshot.docs
           .map((doc) => trackToSong(Track.fromFirestore(doc)))
           .toList();
+      return tracks;
     });
   } catch (e) {
     dev.log('Fallback to simple query in tracksStreamProvider: $e');

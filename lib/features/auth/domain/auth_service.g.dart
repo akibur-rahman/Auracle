@@ -1,10 +1,4 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'auth_service.dart';
-
-// **************************************************************************
-// RiverpodGenerator
-// **************************************************************************
 
 String _$authServiceHash() => r'2b5510c4bcc83cde5465d04dd345fa4e4cd91e07';
 

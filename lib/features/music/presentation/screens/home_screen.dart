@@ -23,7 +23,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watch the stream-based homeDataProvider
+    // Watch the homeDataProvider which now returns AsyncValue<HomeViewModel>
     final homeDataAsync = ref.watch(homeDataProvider);
     // Switch to using the stream-based tracksProvider
     final tracksAsync = ref.watch(tracksStreamProvider);
@@ -31,14 +31,11 @@ class HomeScreen extends ConsumerWidget {
     final initialSongAsync = ref.watch(initialSongProvider);
 
     // Initialize the current song when the home screen is loaded
-    ref.listen<AsyncValue<HomeViewModel>>(homeDataProvider, (_, state) {
-      if (state.hasValue && ref.read(currentSongProvider) == null) {
-        // Set initial song from Firebase
-        initialSongAsync.whenData((song) {
-          if (song != null && ref.read(currentSongProvider) == null) {
-            ref.read(currentSongProvider.notifier).state = song;
-          }
-        });
+    ref.listen<AsyncValue<Song?>>(initialSongProvider, (_, state) {
+      if (state.hasValue &&
+          ref.read(currentSongProvider) == null &&
+          state.value != null) {
+        ref.read(currentSongProvider.notifier).state = state.value;
       }
     });
 

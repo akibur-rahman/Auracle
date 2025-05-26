@@ -1,80 +1,97 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import '../domain/models/song.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:developer' as dev;
 import 'tracks_provider.dart';
 
-// The minimum score a result needs to be considered a match
-const int _minFuzzyScore = 60;
+// Provider to store the current search query
+final searchQueryProvider = StateProvider<String>((ref) => '');
 
-final searchResultsProvider =
-    StateNotifierProvider<SearchResultsNotifier, List<Song>>((ref) {
-  return SearchResultsNotifier(ref);
+// Provider for search results using caseInsensitiveContains matching
+final searchResultsProvider = FutureProvider<List<Song>>((ref) async {
+  final query = ref.watch(searchQueryProvider);
+
+  // If query is empty, return empty list
+  if (query.trim().isEmpty) {
+    return [];
+  }
+
+  try {
+    final searchTerm = query.toLowerCase();
+    final artistMatches = <String>{};
+    final songResults = <Song>[];
+    final songIds = <String>{};
+
+    // Get all tracks from Firestore
+    // Note: In a production app with thousands of tracks,
+    // you'd implement server-side search or use Algolia/Elasticsearch
+    final tracksSnapshot = await FirebaseFirestore.instance
+        .collection('tracks')
+        .where('isDeleted', isEqualTo: false)
+        .get();
+
+    // First pass: Find direct song matches and collect matching artists
+    for (final doc in tracksSnapshot.docs) {
+      final data = doc.data();
+      final title = data['title']?.toString().toLowerCase() ?? '';
+      final artist = data['artist']?.toString().toLowerCase() ?? '';
+      final album = data['album']?.toString().toLowerCase() ?? '';
+
+      // Check if this song matches the search query
+      final isTitleMatch = title.contains(searchTerm);
+      final isArtistMatch = artist.contains(searchTerm);
+      final isAlbumMatch = album.contains(searchTerm);
+
+      // If the artist matches, remember it for second pass
+      if (isArtistMatch) {
+        artistMatches.add(artist);
+      }
+
+      // Add direct matches to results
+      if (isTitleMatch || isArtistMatch || isAlbumMatch) {
+        final song = trackToSong(doc);
+        // Only add if not already in results (avoid duplicates)
+        if (!songIds.contains(song.id)) {
+          songResults.add(song);
+          songIds.add(song.id);
+        }
+      }
+    }
+
+    // Second pass: Find songs by matching artists not already in results
+    if (artistMatches.isNotEmpty) {
+      for (final doc in tracksSnapshot.docs) {
+        final data = doc.data();
+        final artist = data['artist']?.toString().toLowerCase() ?? '';
+
+        if (artistMatches.contains(artist)) {
+          final song = trackToSong(doc);
+          // Only add if not already in results
+          if (!songIds.contains(song.id)) {
+            songResults.add(song);
+            songIds.add(song.id);
+          }
+        }
+      }
+    }
+
+    return songResults;
+  } catch (e) {
+    dev.log('Error searching tracks: $e');
+    return [];
+  }
 });
 
-class SearchResultsNotifier extends StateNotifier<List<Song>> {
-  final Ref ref;
-
-  SearchResultsNotifier(this.ref) : super([]);
-
-  void search(String query) {
-    if (query.isEmpty) {
-      state = [];
-      return;
-    }
-
-    // Get all songs from the tracksStreamProvider
-    final tracks = ref.read(tracksStreamProvider).valueOrNull ?? [];
-
-    // Set to track already added songs to avoid duplicates
-    final Set<String> addedSongIds = {};
-    final List<Song> results = [];
-
-    // Convert query to lowercase for case-insensitive comparison
-    final lowercaseQuery = query.toLowerCase();
-
-    // First, add exact matches for song title with higher priority
-    for (final song in tracks) {
-      final lowercaseTitle = song.title.toLowerCase();
-
-      // Direct contains match for song title (highest priority)
-      if (lowercaseTitle.contains(lowercaseQuery) &&
-          !addedSongIds.contains(song.id)) {
-        results.add(song);
-        addedSongIds.add(song.id);
-      }
-    }
-
-    // Next, add exact matches for artist name
-    for (final song in tracks) {
-      final lowercaseArtist = song.artist.toLowerCase();
-
-      // Direct contains match for artist
-      if (lowercaseArtist.contains(lowercaseQuery) &&
-          !addedSongIds.contains(song.id)) {
-        results.add(song);
-        addedSongIds.add(song.id);
-      }
-    }
-
-    // Finally, use fuzzy matching for anything that might have been missed
-    for (final song in tracks) {
-      // Skip songs already added
-      if (addedSongIds.contains(song.id)) continue;
-
-      // Get fuzzy match scores
-      final titleScore = partialRatio(query, song.title);
-      final artistScore = partialRatio(query, song.artist);
-
-      // Use the better of the two scores
-      final bestScore = titleScore > artistScore ? titleScore : artistScore;
-
-      // Add to results if score is high enough
-      if (bestScore >= _minFuzzyScore) {
-        results.add(song);
-        addedSongIds.add(song.id);
-      }
-    }
-
-    state = results;
-  }
+// Helper function to convert Firestore document to Song model
+Song trackToSong(DocumentSnapshot doc) {
+  final data = doc.data() as Map<String, dynamic>;
+  return Song(
+    id: doc.id,
+    title: data['title'] ?? 'Unknown Title',
+    artist: data['artist'] ?? 'Unknown Artist',
+    albumName: data['album'] ?? '',
+    imageUrl: data['coverArtUrl'] ?? '',
+    duration: '3:45', // Default duration since not included in data
+    storageUrl: data['storageUrl'],
+  );
 }

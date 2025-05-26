@@ -4,37 +4,54 @@ import '../domain/models/playlist.dart';
 import '../domain/models/song.dart';
 import 'tracks_provider.dart';
 import 'player_provider.dart';
+import 'dart:developer' as dev;
 
-// Convert to StreamProvider for real-time updates
-final homeDataProvider = StreamProvider<HomeViewModel>((ref) async* {
-  // Get the recently played tracks from the provider
+// Create a simple provider that combines data from multiple sources
+final homeDataProvider = Provider<AsyncValue<HomeViewModel>>((ref) {
+  // Watch recently played tracks
   final recentlyPlayed = ref.watch(recentlyPlayedProvider);
 
-  // Initial state with recently played (if available)
-  yield HomeViewModel(
-    recentlyPlayed: recentlyPlayed.isNotEmpty
-        ? _createAlbumsFromTracks(recentlyPlayed)
-        : [],
-    YourPlaylist: [],
-    LocalMusic: [],
+  // Watch track data - use future provider initially to get immediate data
+  final tracksAsync = ref.watch(tracksStreamProvider);
+
+  // Combine the data
+  return tracksAsync.when(
+    data: (tracks) {
+      final recentAlbums = recentlyPlayed.isNotEmpty
+          ? _createAlbumsFromTracks(recentlyPlayed)
+          : _createAlbumsFromTracks(tracks);
+
+      return AsyncData(HomeViewModel(
+        recentlyPlayed: recentAlbums,
+        YourPlaylist: [], // Empty for now
+        LocalMusic: [],
+      ));
+    },
+    loading: () {
+      // If we're still loading tracks but have recently played items,
+      // show a partial view with just the recently played
+      if (recentlyPlayed.isNotEmpty) {
+        return AsyncData(HomeViewModel(
+          recentlyPlayed: _createAlbumsFromTracks(recentlyPlayed),
+          YourPlaylist: [],
+          LocalMusic: [],
+        ));
+      }
+      return const AsyncLoading();
+    },
+    error: (error, stack) {
+      dev.log('Error in homeDataProvider: $error');
+      // If we have recently played, still show those even on error
+      if (recentlyPlayed.isNotEmpty) {
+        return AsyncData(HomeViewModel(
+          recentlyPlayed: _createAlbumsFromTracks(recentlyPlayed),
+          YourPlaylist: [],
+          LocalMusic: [],
+        ));
+      }
+      return AsyncError(error, stack);
+    },
   );
-
-  // Stream of tracks to get real-time updates
-  await for (final trackSnapshot in ref.watch(tracksStreamProvider.stream)) {
-    final recentAlbums = recentlyPlayed.isNotEmpty
-        ? _createAlbumsFromTracks(recentlyPlayed)
-        : _createAlbumsFromTracks(trackSnapshot);
-
-    // Get playlists (empty list for now)
-    final playlists = <Playlist>[];
-
-    // Yield updated data
-    yield HomeViewModel(
-      recentlyPlayed: recentAlbums,
-      YourPlaylist: playlists,
-      LocalMusic: [], // No local music for now
-    );
-  }
 });
 
 // Helper to create album objects from tracks

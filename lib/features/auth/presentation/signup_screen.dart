@@ -87,9 +87,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   Text(
                     'Create Account',
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -186,9 +186,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       'https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png',
                       width: 24,
                       height: 24,
-                      errorBuilder:
-                          (context, error, stackTrace) =>
-                              const Icon(Icons.g_mobiledata, size: 24),
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.g_mobiledata, size: 24),
                     ),
                   ),
                   const SizedBox(height: 32),
