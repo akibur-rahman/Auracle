@@ -18,14 +18,13 @@ A modern music streaming application built with Flutter, featuring a beautiful d
   - Volume control
 - 📱 Responsive design that works on all screen sizes
 - 🔄 Real-time data synchronization
-- 🎯 Offline mode support
 - 🌐 Cross-platform support (Android, iOS, Web)
 
 ## 📸 Screenshots
 
 ### Authentication Screens
 ![Login Screen](screenshots/screenshot2.png)
-![Signup Screen](screenshots/screenshot3.png)
+![Signup Screen](screenshots/screenshot3.jpg)
 
 ### Main App Screens
 ![Home Screen](screenshots/screenshot4.png)
